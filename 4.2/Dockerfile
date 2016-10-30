@@ -25,6 +25,6 @@ RUN	curl -fsSL https://www.adminer.org/static/download/$ADMINER_VERSION/adminer-
 &&	echo "$ADMINER_DOWNLOAD_SHA256  adminer.php" |sha256sum -c -
 
 USER	adminer
-CMD	php -S 0.0.0.0:8080 -t /var/www/html
+CMD	[ "php", "-S", "0.0.0.0:8080", "-t", "/var/www/html" ]
 
 EXPOSE 8080
