@@ -1,5 +1,4 @@
 FROM php:7.0-fpm-alpine
-MAINTAINER Tim Düsterhus
 
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
