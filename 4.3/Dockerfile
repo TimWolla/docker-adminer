@@ -1,5 +1,7 @@
 FROM php:7.0-alpine
 
+STOPSIGNAL SIGINT
+
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
 &&	mkdir -p /var/www/html
