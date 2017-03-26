@@ -32,7 +32,7 @@ RUN	curl -fsSL https://www.adminer.org/static/download/$ADMINER_VERSION/adminer-
 &&	rm source.tar.gz
 
 COPY	entrypoint.sh /usr/local/bin/
-ENTRYPOINT	["entrypoint.sh"]
+ENTRYPOINT	[ "entrypoint.sh", "docker-php-entrypoint" ]
 
 USER	adminer
 CMD	[ "php", "-S", "0.0.0.0:8080", "-t", "/var/www/html" ]
