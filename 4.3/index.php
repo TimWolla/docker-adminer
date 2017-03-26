@@ -18,6 +18,12 @@ namespace docker {
 }
 
 namespace {
+	if (basename($_SERVER['REQUEST_URI']) === 'adminer.css' && is_readable('adminer.css')) {
+		header('Content-Type: text/css');
+		readfile('adminer.css');
+		exit;
+	}
+
 	function adminer_object() {
 		return \docker\adminer_object();
 	}
