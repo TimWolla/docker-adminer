@@ -3,6 +3,7 @@ FROM php:7.0-fpm-alpine
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
 &&	mkdir -p /var/www/html \
+&&	mkdir -p /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
 
 RUN	apk add --no-cache libpq
@@ -14,7 +15,7 @@ RUN	set -x \
 &&	docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite \
 &&	apk del .build-deps
 
-COPY	index.php .
+COPY	*.php /var/www/html/
 
 ENV	ADMINER_VERSION 4.3.0
 ENV	ADMINER_DOWNLOAD_SHA256 3584e1b3c7f853118d66a92f9c0996c8db39b05ac2a2b2623ff1676ec09bc08e
@@ -25,7 +26,7 @@ RUN	set -x \
 &&	echo "$ADMINER_DOWNLOAD_SHA256  adminer.php" |sha256sum -c - \
 &&	curl -fsSL https://github.com/vrana/adminer/archive/v$ADMINER_VERSION.tar.gz -o source.tar.gz \
 &&	echo "$ADMINER_SRC_DOWNLOAD_SHA256  source.tar.gz" |sha256sum -c - \
-&&	tar xzf source.tar.gz --strip-components=1 "adminer-$ADMINER_VERSION/designs/" \
+&&	tar xzf source.tar.gz --strip-components=1 "adminer-$ADMINER_VERSION/designs/" "adminer-$ADMINER_VERSION/plugins/" \
 &&	rm source.tar.gz
 
 COPY	entrypoint.sh /usr/local/bin/

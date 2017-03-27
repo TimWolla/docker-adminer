@@ -1,19 +1,30 @@
 <?php
 namespace docker {
 	function adminer_object() {
-		class Adminer extends \Adminer {
-			function loginForm() {
-				ob_start();
-				$return = parent::loginForm();
-				$form = ob_get_clean();
+		require_once('plugins/plugin.php');
 
-				echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="db" title="hostname[:port]"', $form);
+		class Adminer extends \AdminerPlugin {
+			function _callParent($function, $args) {
+				if ($function === 'loginForm') {
+					ob_start();
+					$return = \Adminer::loginForm();
+					$form = ob_get_clean();
 
-				return $return;
+					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="db" title="hostname[:port]"', $form);
+
+					return $return;
+				}
+
+				return parent::_callParent($function, $args);
 			}
 		}
 
-		return new Adminer();
+		$plugins = [];
+		foreach (glob('plugins-enabled/*.php') as $plugin) {
+			$plugins[] = require($plugin);
+		}
+
+		return new Adminer($plugins);
 	}
 }
 
