@@ -5,6 +5,7 @@ STOPSIGNAL SIGINT
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
 &&	mkdir -p /var/www/html \
+&&	mkdir -p /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
 
 WORKDIR /var/www/html
@@ -18,7 +19,7 @@ RUN	set -x \
 &&	docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite \
 &&	apk del .build-deps
 
-COPY	index.php .
+COPY	*.php /var/www/html/
 
 ENV	ADMINER_VERSION 4.3.1
 ENV	ADMINER_DOWNLOAD_SHA256 71688c5db4d4e504c48c26ec2966ad85e721ef61e0377c5505cfb50b026d5491
@@ -29,7 +30,7 @@ RUN	set -x \
 &&	echo "$ADMINER_DOWNLOAD_SHA256  adminer.php" |sha256sum -c - \
 &&	curl -fsSL https://github.com/vrana/adminer/archive/v$ADMINER_VERSION.tar.gz -o source.tar.gz \
 &&	echo "$ADMINER_SRC_DOWNLOAD_SHA256  source.tar.gz" |sha256sum -c - \
-&&	tar xzf source.tar.gz --strip-components=1 "adminer-$ADMINER_VERSION/designs/" \
+&&	tar xzf source.tar.gz --strip-components=1 "adminer-$ADMINER_VERSION/designs/" "adminer-$ADMINER_VERSION/plugins/" \
 &&	rm source.tar.gz
 
 COPY	entrypoint.sh /usr/local/bin/
