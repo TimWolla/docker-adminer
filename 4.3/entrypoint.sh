@@ -2,7 +2,7 @@
 set -e
 
 if [ -n "$ADMINER_DESIGN" ]; then
-	ln -s "designs/$ADMINER_DESIGN/adminer.css" .
+	ln -sf "designs/$ADMINER_DESIGN/adminer.css" .
 fi
 
 number=1
