@@ -37,6 +37,6 @@ COPY	entrypoint.sh /usr/local/bin/
 ENTRYPOINT	[ "entrypoint.sh", "docker-php-entrypoint" ]
 
 USER	adminer
-CMD	[ "php", "-S", "0.0.0.0:8080", "-t", "/var/www/html" ]
+CMD	[ "php", "-S", "[::]:8080", "-t", "/var/www/html" ]
 
 EXPOSE 8080
