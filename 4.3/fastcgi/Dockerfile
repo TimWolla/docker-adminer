@@ -1,4 +1,4 @@
-FROM php:7.0-fpm-alpine
+FROM php:7.2-fpm-alpine
 
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
