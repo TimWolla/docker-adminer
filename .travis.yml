@@ -23,6 +23,8 @@ script:
   - docker run --name adminer_design -e ADMINER_DESIGN=nette -d $image
   - "docker run -i --rm --link adminer_design:adminer buildpack-deps:curl curl -fsSL http://adminer:8080 |grep 'adminer.css'"
   - "docker run -i --rm --link adminer_design:adminer buildpack-deps:curl curl -fsSL http://adminer:8080/adminer.css |grep 'Nette'"
+  - docker run --name adminer_server -e ADMINER_DEFAULT_SERVER=ADMINER_DEFAULT_SERVER_WORKS -d $image
+  - "docker run -i --rm --link adminer_server:adminer buildpack-deps:curl curl -fsSL http://adminer:8080 |grep 'ADMINER_DEFAULT_SERVER_WORKS'"
 
 after_script:
   - docker ps -a
