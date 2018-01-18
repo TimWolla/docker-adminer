@@ -1,10 +1,14 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.2-alpine
+
+STOPSIGNAL SIGINT
 
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
 &&	mkdir -p /var/www/html \
 &&	mkdir -p /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
+
+WORKDIR /var/www/html
 
 RUN	apk add --no-cache libpq
 
@@ -17,9 +21,9 @@ RUN	set -x \
 
 COPY	*.php /var/www/html/
 
-ENV	ADMINER_VERSION 4.3.1
-ENV	ADMINER_DOWNLOAD_SHA256 71688c5db4d4e504c48c26ec2966ad85e721ef61e0377c5505cfb50b026d5491
-ENV	ADMINER_SRC_DOWNLOAD_SHA256 fd016c93bb3bb8e85ed9cf826064584012c4db83f30c4948d701250e29a6d953
+ENV	ADMINER_VERSION 4.4.0
+ENV	ADMINER_DOWNLOAD_SHA256 8c68ecabff07ea2207a9a8a634966cf0da8c20ab8299148329b0bff44d6174d7
+ENV	ADMINER_SRC_DOWNLOAD_SHA256 ecd89a033d8561ffa65edd305cd18eec7538d8632e82dcec32cb9e2b05572f58
 
 RUN	set -x \
 &&	curl -fsSL https://github.com/vrana/adminer/releases/download/v$ADMINER_VERSION/adminer-$ADMINER_VERSION-en.php -o adminer.php \
@@ -33,4 +37,6 @@ COPY	entrypoint.sh /usr/local/bin/
 ENTRYPOINT	[ "entrypoint.sh", "docker-php-entrypoint" ]
 
 USER	adminer
-CMD	[ "php-fpm" ]
+CMD	[ "php", "-S", "[::]:8080", "-t", "/var/www/html" ]
+
+EXPOSE 8080
