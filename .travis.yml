@@ -3,7 +3,7 @@ sudo: required
 language: bash
 
 env:
-  - VERSION=4.6 VARIANT=
+  - VERSION=4 VARIANT=
 
 services:
   - docker
