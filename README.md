@@ -1,63 +1,27 @@
-# Adminer
+# https://github.com/TimWolla/docker-adminer
 
-## What is Adminer?
+## Maintained by: [Tim Düsterhus (of the Docker Community)](https://github.com/TimWolla/docker-adminer)
 
-Adminer (formerly phpMinAdmin) is a full-featured database management tool written in PHP. Conversely to phpMyAdmin, it consist of a single file ready to deploy to the target server. Adminer is available for MySQL, PostgreSQL, SQLite, MS SQL, Oracle, Firebird, SimpleDB, Elasticsearch and MongoDB.
+This is the Git repo of the [Docker "Official Image"](https://docs.docker.com/docker-hub/official_repos/) for [adminer](https://hub.docker.com/_/adminer/) (not to be confused with any official adminer image provided by adminer upstream). See [the Docker Hub page](https://hub.docker.com/_/adminer/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
-> [adminer.org](https://www.adminer.org)
+The [full description from Docker Hub](https://hub.docker.com/_/adminer/) is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/adminer](https://github.com/docker-library/docs/tree/master/adminer).
 
-## How to use this image
+## See a change merged here that doesn't show up on Docker Hub yet?
 
-### Standalone
+Check [the "library/adminer" manifest file in the docker-library/official-images repo](https://github.com/docker-library/official-images/blob/master/library/adminer), especially [PRs with the "library/adminer" label on that repo](https://github.com/docker-library/official-images/labels/library%2Fadminer).
 
-	$ docker run --link some_database:db -p 8080:8080 adminer
+For more information about the official images process, see the [docker-library/official-images readme](https://github.com/docker-library/official-images/blob/master/README.md).
 
-Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
+---
 
-### FastCGI
+-	[Travis CI:  
+	![build status badge](https://img.shields.io/travis/TimWolla/docker-adminer/master.svg)](https://travis-ci.org/TimWolla/docker-adminer/branches)
+-	[Automated `update.sh`:  
+	![build status badge](https://doi-janky.infosiftr.net/job/update.sh/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/update.sh/job/adminer)
 
-If you are already running a FastCGI capable web server you might prefer running adminer via FastCGI:
-	
-	$ docker run --link some_database:db -p 9000:9000 adminer:fastcgi
-	
-Then point your web server to port 9000 of the container.
-	
-Note: This exposes the FastCGI socket to the Internet. Make sure to add proper firewall rules to prevent a direct access.
+| Build | Status | Badges | (per-arch) |
+|:-:|:-:|:-:|:-:|
+| [`amd64`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer) | [`arm32v6`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer) | [`arm64v8`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer) | [`i386`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer) |
+| [`ppc64le`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer) |
 
-### Loading plugins
-
-This image bundles all official adminer plugins. You can find the list of plugins on GitHub: https://github.com/vrana/adminer/tree/master/plugins.
-
-To load plugins you can pass a list of filenames in `ADMINER_PLUGINS`:
-
-	$ docker run --link some_database:db -p 8080:8080 -e ADMINER_PLUGINS='tables-filter tinymce' adminer
-
-If a plugin *requires* parameters to work correctly you will need to add a custom file to the container:
-
-	$ docker run --link some_database:db -p 8080:8080 -e ADMINER_PLUGINS='login-servers' adminer
-	Unable to load plugin file "login-servers", because it has required parameters: servers
-	Create a file "/var/www/html/plugins-enabled/login-servers.php" with the following contents to load the plugin:
-
-	<?php
-	require_once('plugins/login-servers.php');
-
-	/** Set supported servers
-		* @param array array($domain) or array($domain => $description) or array($category => array())
-		* @param string
-		*/
-	return new AdminerLoginServers(
-		$servers = ???,
-		$driver = 'server'
-	);
-
-To load a custom plugin you can add PHP scripts that return the instance of the plugin object to `/var/www/html/plugins-enabled/`.
-
-### Choosing a design
-
-The image bundles all the designs that are available in the source package of adminer. You can find the list of designs on GitHub: https://github.com/vrana/adminer/tree/master/designs.
-
-To use a bundled design you can pass its name in `ADMINER_DESIGN`:
-
-	$ docker run --link some_database:db -p 8080:8080 -e ADMINER_DESIGN='nette' adminer
-
-To use a custom design you can add a file called `/var/www/html/adminer.css`.
+<!-- THIS FILE IS GENERATED BY https://github.com/docker-library/docs/blob/master/generate-repo-stub-readme.sh -->
