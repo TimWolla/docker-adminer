@@ -18,6 +18,7 @@ script:
   - docker build -t $image ${VERSION}${VARIANT:+/$VARIANT}
   - docker run --name adminer -d $image
   - "docker run -i --rm --link adminer:adminer buildpack-deps:curl curl -fsSL http://adminer:8080 |grep '<span class=\"version\">'${VERSION}"
+  - "! docker run -i --rm --link adminer:adminer buildpack-deps:curl curl -fsSL http://adminer:8080 |grep '<b>Warning</b>:'"
   - docker restart adminer
   - "docker run -i --rm --link adminer:adminer buildpack-deps:curl curl -fsSL http://adminer:8080 |grep '<span class=\"version\">'${VERSION}"
   - docker run --name adminer_design -e ADMINER_DESIGN=nette -d $image
