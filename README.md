@@ -2,26 +2,24 @@
 
 ## Maintained by: [Tim Düsterhus (of the Docker Community)](https://github.com/TimWolla/docker-adminer)
 
-This is the Git repo of the [Docker "Official Image"](https://docs.docker.com/docker-hub/official_repos/) for [adminer](https://hub.docker.com/_/adminer/) (not to be confused with any official adminer image provided by adminer upstream). See [the Docker Hub page](https://hub.docker.com/_/adminer/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
+This is the Git repo of the [Docker "Official Image"](https://github.com/docker-library/official-images#what-are-official-images) for [`adminer`](https://hub.docker.com/_/adminer/) (not to be confused with any official `adminer` image provided by `adminer` upstream). See [the Docker Hub page](https://hub.docker.com/_/adminer/) for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
-The [full description from Docker Hub](https://hub.docker.com/_/adminer/) is generated over in [docker-library/docs](https://github.com/docker-library/docs), specifically in [docker-library/docs/adminer](https://github.com/docker-library/docs/tree/master/adminer).
+The [full image description on Docker Hub](https://hub.docker.com/_/adminer/) is generated/maintained over in [the docker-library/docs repository](https://github.com/docker-library/docs), specifically in [the `adminer` directory](https://github.com/docker-library/docs/tree/master/adminer).
 
 ## See a change merged here that doesn't show up on Docker Hub yet?
 
-Check [the "library/adminer" manifest file in the docker-library/official-images repo](https://github.com/docker-library/official-images/blob/master/library/adminer), especially [PRs with the "library/adminer" label on that repo](https://github.com/docker-library/official-images/labels/library%2Fadminer).
+For more information about the full official images change lifecycle, see [the "An image's source changed in Git, now what?" FAQ entry](https://github.com/docker-library/faq#an-images-source-changed-in-git-now-what).
 
-For more information about the official images process, see the [docker-library/official-images readme](https://github.com/docker-library/official-images/blob/master/README.md).
+For outstanding `adminer` image PRs, check [PRs with the "library/adminer" label on the official-images repository](https://github.com/docker-library/official-images/labels/library%2Fadminer). For the current "source of truth" for [`adminer`](https://hub.docker.com/_/adminer/), see [the `library/adminer` file in the official-images repository](https://github.com/docker-library/official-images/blob/master/library/adminer).
 
 ---
 
--	[Travis CI:  
-	![build status badge](https://img.shields.io/travis/TimWolla/docker-adminer/master.svg)](https://travis-ci.org/TimWolla/docker-adminer/branches)
--	[Automated `update.sh`:  
-	![build status badge](https://doi-janky.infosiftr.net/job/update.sh/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/update.sh/job/adminer)
+-	[![build status badge](https://img.shields.io/travis/TimWolla/docker-adminer/master.svg?label=Travis%20CI)](https://travis-ci.org/TimWolla/docker-adminer/branches)
+-	[![build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/update.sh/job/adminer.svg?label=Automated%20update.sh)](https://doi-janky.infosiftr.net/job/update.sh/job/adminer)
 
 | Build | Status | Badges | (per-arch) |
 |:-:|:-:|:-:|:-:|
-| [`amd64`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer) | [`arm32v6`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer) | [`arm64v8`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer) | [`i386`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer) |
-| [`ppc64le`<br />![build status badge](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer/badge/icon)](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer) |
+| [![amd64 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer.svg?label=amd64)](https://doi-janky.infosiftr.net/job/multiarch/job/amd64/job/adminer) | [![arm32v6 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer.svg?label=arm32v6)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v6/job/adminer) | [![arm32v7 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/adminer.svg?label=arm32v7)](https://doi-janky.infosiftr.net/job/multiarch/job/arm32v7/job/adminer) | [![arm64v8 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer.svg?label=arm64v8)](https://doi-janky.infosiftr.net/job/multiarch/job/arm64v8/job/adminer) |
+| [![i386 build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer.svg?label=i386)](https://doi-janky.infosiftr.net/job/multiarch/job/i386/job/adminer) | [![ppc64le build status badge](https://img.shields.io/jenkins/s/https/doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer.svg?label=ppc64le)](https://doi-janky.infosiftr.net/job/multiarch/job/ppc64le/job/adminer) |
 
 <!-- THIS FILE IS GENERATED BY https://github.com/docker-library/docs/blob/master/generate-repo-stub-readme.sh -->
