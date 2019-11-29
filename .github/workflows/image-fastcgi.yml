@@ -1,0 +1,11 @@
+name: Build FastCGI Docker Image
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the Docker image
+      run: docker build 4/fastcgi --tag adminer:4-fastcgi-$(date +%s)
