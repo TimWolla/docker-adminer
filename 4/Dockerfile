@@ -19,10 +19,22 @@ WORKDIR /var/www/html
 RUN	apk add --no-cache libpq
 
 RUN	set -x \
+&&	apk add --no-cache --virtual .php-ext-deps \
+	unixodbc \
+	freetds \
 &&	apk add --no-cache --virtual .build-deps \
 	postgresql-dev \
 	sqlite-dev \
-&&	docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite \
+	unixodbc-dev \
+	freetds-dev \
+&&	docker-php-ext-configure \
+	pdo_odbc --with-pdo-odbc=unixODBC,/usr \
+&&	docker-php-ext-install \
+	pdo_mysql \
+	pdo_pgsql \
+	pdo_sqlite \
+	pdo_odbc \
+	pdo_dblib \
 &&	apk del .build-deps
 
 COPY	*.php /var/www/html/
