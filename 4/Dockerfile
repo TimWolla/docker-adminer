@@ -16,13 +16,26 @@ RUN	addgroup -S adminer \
 
 WORKDIR /var/www/html
 
-RUN	apk add --no-cache libpq
-
 RUN	set -x \
 &&	apk add --no-cache --virtual .build-deps \
 	postgresql-dev \
 	sqlite-dev \
-&&	docker-php-ext-install pdo_mysql pdo_pgsql pdo_sqlite \
+	unixodbc-dev \
+	freetds-dev \
+&&	docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
+&&	docker-php-ext-install \
+	pdo_mysql \
+	pdo_pgsql \
+	pdo_sqlite \
+	pdo_odbc \
+	pdo_dblib \
+&&	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local/lib/php/extensions \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+	)" \
+&&	apk add --virtual .phpexts-rundeps $runDeps \
 &&	apk del .build-deps
 
 COPY	*.php /var/www/html/
