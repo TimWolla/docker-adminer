@@ -2,10 +2,14 @@
 set -e
 
 if [ -n "$ADMINER_DESIGN" ]; then
-	# Only create link on initial start, to ensure that explicit changes to
-	# adminer.css after the container was started once are preserved.
-	if [ ! -e .adminer-init ]; then
-		ln -sf "designs/$ADMINER_DESIGN/adminer.css" .
+    if [ "${ADMINER_DESIGN%:*}" == "https" ]; then
+	  curl -Lo adminer.css $ADMINER_DESIGN
+	else
+		# Only create link on initial start, to ensure that explicit changes to
+		# adminer.css after the container was started once are preserved.
+		if [ ! -e .adminer-init ]; then
+			ln -sf "designs/$ADMINER_DESIGN/adminer.css" .
+		fi
 	fi
 fi
 
