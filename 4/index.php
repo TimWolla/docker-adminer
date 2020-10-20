@@ -29,7 +29,7 @@ namespace docker {
 }
 
 namespace {
-	if (basename($_SERVER['DOCUMENT_URI']) === 'adminer.css' && is_readable('adminer.css')) {
+	if (basename($_SERVER['DOCUMENT_URI'] ?? $_SERVER['REQUEST_URI']) === 'adminer.css' && is_readable('adminer.css')) {
 		header('Content-Type: text/css');
 		readfile('adminer.css');
 		exit;
