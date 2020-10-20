@@ -1,0 +1,23 @@
+name: Build Docker Image
+
+on:
+- push
+- pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        variant:
+        - "4"
+        - "4/fastcgi"
+    steps:
+    - uses: actions/checkout@v1
+    - name: docker build
+      run: |
+        echo "::group::Sending context"
+        docker build "$VARIANT" --tag adminer:${VARIANT/\//-}-$(date +%s) |sed 's/^Step/::endgroup::\n::group::Step/'
+        echo "::endgroup::"
+      env:
+        VARIANT: ${{ matrix.variant }}
