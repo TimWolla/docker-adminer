@@ -15,9 +15,14 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: docker build
+      id: build
       run: |
-        echo "::group::Sending context"
-        docker build "$VARIANT" --tag adminer:${VARIANT/\//-}-$(date +%s) |sed 's/^Step/::endgroup::\n::group::Step/'
-        echo "::endgroup::"
+        printf "::group::Sending context\n"
+        IMAGE=adminer:${VARIANT/\//-}-$(date +%s)
+        docker build "$VARIANT" --tag "$IMAGE" |sed 's/^Step/::endgroup::\n::group::Step/'
+        printf "::endgroup::\n"
+        printf "::set-output name=%s::%s\n" "image" "$IMAGE"
       env:
         VARIANT: ${{ matrix.variant }}
+    - run: docker run --name adminer -d ${{ steps.build.outputs.image }}
+    - run: docker ps -a
