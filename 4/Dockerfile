@@ -1,4 +1,4 @@
-FROM php:7.4-alpine
+FROM php:8.0-rc-alpine
 
 RUN	echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
 &&	echo "post_max_size = 128M" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
