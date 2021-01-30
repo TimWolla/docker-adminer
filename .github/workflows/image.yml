@@ -14,7 +14,7 @@ jobs:
         - "4/fastcgi"
     steps:
     - uses: actions/checkout@v1
-    - name: docker build
+    - name: Build the image.
       id: build
       run: |
         printf "::group::Sending context\n"
@@ -22,7 +22,69 @@ jobs:
         docker build "$VARIANT" --tag "$IMAGE" |sed 's/^Step/::endgroup::\n::group::Step/'
         printf "::endgroup::\n"
         printf "::set-output name=%s::%s\n" "image" "$IMAGE"
+        printf "::set-output name=%s::%s\n" "version" "$(awk '/^ENV\s+ADMINER_VERSION/{print $3}' "$VARIANT/Dockerfile")"
       env:
         VARIANT: ${{ matrix.variant }}
-    - run: docker run --name adminer -d ${{ steps.build.outputs.image }}
-    - run: docker ps -a
+    - name: Smoketest
+      run: |
+        docker run --name $container_name -d ${{ steps.build.outputs.image }}
+      env:
+        container_name: adminer_smoke 
+    - name: Verify a restart works.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/
+        docker restart $container_name
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/
+      env:
+        container_name: adminer_restart
+    - name: Verify version.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep '<span class=\"version\">'${{ steps.build.outputs.version }}
+      env:
+        container_name: adminer_version
+    - name: Verify that no warnings appear.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d ${{ steps.build.outputs.image }}
+        ! docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep '<b>Warning</b>:'
+      env:
+        container_name: adminer_warnings
+    - name: Verify that the design works.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d -e ADMINER_DESIGN=nette ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep 'adminer.css'
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/adminer.css \
+          |grep 'Nette'
+      env:
+        container_name: adminer_design
+    - name: Verify that the default server works.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d -e ADMINER_DEFAULT_SERVER=ADMINER_DEFAULT_SERVER_WORKS ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep 'ADMINER_DEFAULT_SERVER_WORKS'
+      env:
+        container_name: adminer_defaultserver
+    - name: Show Containers and Images
+      run: |
+        printf "::group::docker ps -a\n"
+        docker ps -a
+        printf "::endgroup::\n"
+        printf "::group::docker images\n"
+        docker images
+        printf "::endgroup::\n"
