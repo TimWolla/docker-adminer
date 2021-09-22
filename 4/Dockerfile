@@ -42,15 +42,17 @@ COPY	*.php /var/www/html/
 
 ENV	ADMINER_VERSION 4.8.1
 ENV	ADMINER_DOWNLOAD_SHA256 2fd7e6d8f987b243ab1839249551f62adce19704c47d3d0c8dd9e57ea5b9c6b3
-ENV	ADMINER_SRC_DOWNLOAD_SHA256 ef832414296d11eed33e9d85fff3fb316c63f13f05fceb4a961cbe4cb2ae8712
+ENV	ADMINER_COMMIT 1f173e18bdf0be29182e0d67989df56eadea4754
 
 RUN	set -x \
-&&	curl -fsSL https://github.com/vrana/adminer/releases/download/v$ADMINER_VERSION/adminer-$ADMINER_VERSION.php -o adminer.php \
+&&	apk add --no-cache --virtual .build-deps git \
+&&	curl -fsSL "https://github.com/vrana/adminer/releases/download/v$ADMINER_VERSION/adminer-$ADMINER_VERSION.php" -o adminer.php \
 &&	echo "$ADMINER_DOWNLOAD_SHA256  adminer.php" |sha256sum -c - \
-&&	curl -fsSL https://github.com/vrana/adminer/archive/v$ADMINER_VERSION.tar.gz -o source.tar.gz \
-&&	echo "$ADMINER_SRC_DOWNLOAD_SHA256  source.tar.gz" |sha256sum -c - \
-&&	tar xzf source.tar.gz --strip-components=1 "adminer-$ADMINER_VERSION/designs/" "adminer-$ADMINER_VERSION/plugins/" \
-&&	rm source.tar.gz
+&&	git clone --recurse-submodules=designs --depth 1 --shallow-submodules --branch "v$ADMINER_VERSION" https://github.com/vrana/adminer.git /tmp/adminer \
+&&	(cd /tmp/adminer/ && git checkout "$ADMINER_COMMIT") \
+&&	cp -r /tmp/adminer/designs/ /tmp/adminer/plugins/ . \
+&&	rm -rf /tmp/adminer/ \
+&&	apk del --no-network  .build-deps
 
 COPY	entrypoint.sh /usr/local/bin/
 ENTRYPOINT	[ "entrypoint.sh", "docker-php-entrypoint" ]
