@@ -24,7 +24,7 @@ RUN	set -x \
 	freetds-dev \
 &&	docker-php-ext-configure pdo_odbc --with-pdo-odbc=unixODBC,/usr \
 &&	docker-php-ext-install \
-	pdo_mysql \
+	mysqli \
 	pdo_pgsql \
 	pdo_sqlite \
 	pdo_odbc \
