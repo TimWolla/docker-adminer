@@ -4,7 +4,8 @@ RUN	echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/0-upload_larg
 &&	echo "post_max_size = 128M" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
 &&	echo "memory_limit = 1G" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
 &&	echo "max_execution_time = 600" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
-&&	echo "max_input_vars = 5000" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini
+&&	echo "max_input_vars = 5000" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
+&&	echo "display_errors = Off" >> /usr/local/etc/php/php.ini
 
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
