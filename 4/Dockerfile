@@ -13,6 +13,7 @@ RUN	addgroup -S adminer \
 &&	mkdir -p /var/www/html \
 &&	mkdir -p /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
+RUN	chmod 777 /var/www/html/plugins-enabled
 
 WORKDIR /var/www/html
 
