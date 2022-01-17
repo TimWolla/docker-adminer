@@ -9,7 +9,7 @@ RUN	echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/0-upload_larg
 RUN	addgroup -S adminer \
 &&	adduser -S -G adminer adminer \
 &&	mkdir -p /var/www/html \
-&&	mkdir -p /var/www/html/plugins-enabled \
+&&	mkdir /var/www/html/plugins-enabled \
 &&	chown -R adminer:adminer /var/www/html
 
 RUN	set -x \
