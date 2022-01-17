@@ -45,7 +45,8 @@ RUN	set -x \
 &&	curl -fsSL "https://github.com/vrana/adminer/releases/download/v$ADMINER_VERSION/adminer-$ADMINER_VERSION.php" -o adminer.php \
 &&	echo "$ADMINER_DOWNLOAD_SHA256  adminer.php" |sha256sum -c - \
 &&	git clone --recurse-submodules=designs --depth 1 --shallow-submodules --branch "v$ADMINER_VERSION" https://github.com/vrana/adminer.git /tmp/adminer \
-&&	(cd /tmp/adminer/ && git checkout "$ADMINER_COMMIT") \
+&&	commit="$(git -C /tmp/adminer/ rev-parse HEAD)" \
+&&	[ "$commit" = "$ADMINER_COMMIT" ] \
 &&	cp -r /tmp/adminer/designs/ /tmp/adminer/plugins/ . \
 &&	rm -rf /tmp/adminer/ \
 &&	apk del --no-network  .build-deps
