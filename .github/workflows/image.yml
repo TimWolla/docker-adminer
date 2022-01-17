@@ -71,6 +71,18 @@ jobs:
           |grep 'Nette'
       env:
         container_name: adminer_design
+    - name: Verify that the design works (Submodule).
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d -e ADMINER_DESIGN=hydra ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep 'adminer.css'
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/adminer.css \
+          |grep 'Hydra-Dark-Theme-for-Adminer'
+      env:
+        container_name: adminer_design2
     - name: Verify that the default server works.
       if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
       run: |
