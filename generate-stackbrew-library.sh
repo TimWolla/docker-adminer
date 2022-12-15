@@ -102,6 +102,7 @@ for version in "${versions[@]}"; do
 			Tags: $(join ', ' "${variantAliases[@]}")
 			Architectures: $(join ', ' $variantArches)
 			GitCommit: $commit
+			GitFetch: refs/heads/debian-packages
 			Directory: $dir
 		EOE
 	done
