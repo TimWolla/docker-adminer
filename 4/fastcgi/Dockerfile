@@ -11,6 +11,7 @@ RUN	export DEBIAN_FRONTEND="noninteractive" \
 		php7.4-mbstring \
 		php7.4-mysql \
 		php7.4-odbc \
+		php7.4-pdo-dblib \
 		php7.4-pgsql \
 		php7.4-sqlite3 \
 &&	rm -rf /var/lib/apt/lists/*
