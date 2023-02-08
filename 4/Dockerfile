@@ -18,6 +18,7 @@ WORKDIR /var/www/html
 
 RUN	set -x \
 &&	apk add --no-cache --virtual .build-deps \
+	netcat-openbsd \
 	postgresql-dev \
 	sqlite-dev \
 	unixodbc-dev \
