@@ -10,7 +10,13 @@ namespace docker {
 					$return = \Adminer::loginForm();
 					$form = ob_get_clean();
 
-					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db').'" title="hostname[:port]"', $form);
+					$modified_form = str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV["ADMINER_DEFAULT_SERVER"] ?: "db").'" title="hostname[:port]"', $form);
+					$modified_form = str_replace('name="auth[username]" id="username" value=""', 'name="auth[username]" id="username" value="'.$_ENV["ADMINER_DEFAULT_USERNAME"].'"', $modified_form);
+					$modified_form = str_replace('name="auth[db]" value=""', 'name="auth[db]" value="'.$_ENV["ADMINER_DEFAULT_DB_NAME"].'"', $modified_form);
+					$modified_form = str_replace('value="'.$_ENV["ADMINER_DEFAULT_DRIVER"].'"', 'value="'.$_ENV["ADMINER_DEFAULT_DRIVER"].'" selected=""', $modified_form);
+					$modified_form = str_replace('type="password"', 'type="password" value="'.$_ENV["ADMINER_DEFAULT_PASSWORD"].'"', $modified_form);
+
+					echo $modified_form;
 
 					return $return;
 				}
