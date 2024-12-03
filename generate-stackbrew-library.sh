@@ -79,7 +79,9 @@ for version in "${versions[@]}"; do
 
 	for variant in \
 		'' \
-		fastcgi \
+		'evo' \
+		'evo-fastcgi' \
+		'fastcgi' \
 	; do
 		dir="$version${variant:+/$variant}"
 		[ -f "$dir/Dockerfile" ] || continue
