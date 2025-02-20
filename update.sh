@@ -31,9 +31,9 @@ for version in "${versions[@]}"; do
 	echo "  - adminer-${fullVersion}.php: $downloadSha256"
 
 	sed -ri \
-		-e 's/^(ENV\s+ADMINER_VERSION\s+).*/\1'"$fullVersion"'/' \
-		-e 's/^(ENV\s+ADMINER_DOWNLOAD_SHA256\s+).*/\1'"$downloadSha256"'/' \
-		-e 's/^(ENV\s+ADMINER_COMMIT\s+).*/\1'"$commit_hash"'/' \
+		-e 's/^(ENV\s+ADMINER_VERSION=).*/\1'"$fullVersion"'/' \
+		-e 's/^(ENV\s+ADMINER_DOWNLOAD_SHA256=).*/\1'"$downloadSha256"'/' \
+		-e 's/^(ENV\s+ADMINER_COMMIT=).*/\1'"$commit_hash"'/' \
 		"$version/fastcgi/Dockerfile" \
 		"$version/Dockerfile"
 done
