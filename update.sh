@@ -9,15 +9,20 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
-read -r commit_hash fullVersion << EOF
-$(git ls-remote --tags https://github.com/vrana/adminer.git \
-	| awk '{gsub(/refs\/tags\/v/, "", $2); print}' \
-	| sort -rVk2 \
-	| head -1)
-EOF
+allVersions="$(
+	git ls-remote --tags https://github.com/vrana/adminer.git \
+		| cut -d$'\t' -f2 \
+		| grep -E '^refs/tags/v[0-9]+\.[0-9]+' \
+		| cut -dv -f2 \
+		| sort -rV
+)"
 
 for version in "${versions[@]}"; do
-	if [[ "$fullVersion" != $version* ]]; then
+	fullVersion="$(
+		grep -E "^${version}([.-]|$)" <<<"$allVersions" \
+			| head -1
+	)"
+	if [ -z "$fullVersion" ]; then
 		echo >&2 "error: cannot determine full version for '$version'"
 	fi
 
@@ -30,10 +35,17 @@ for version in "${versions[@]}"; do
 	)"
 	echo "  - adminer-${fullVersion}.php: $downloadSha256"
 
+	srcDownloadSha256="$(
+		curl -fsSL "https://github.com/vrana/adminer/archive/v${fullVersion}.tar.gz" \
+			| sha256sum \
+			| cut -d' ' -f1
+	)"
+	echo "  - v${fullVersion}.tar.gz: $srcDownloadSha256"
+
 	sed -ri \
 		-e 's/^(ENV\s+ADMINER_VERSION=).*/\1'"$fullVersion"'/' \
 		-e 's/^(ENV\s+ADMINER_DOWNLOAD_SHA256=).*/\1'"$downloadSha256"'/' \
-		-e 's/^(ENV\s+ADMINER_COMMIT=).*/\1'"$commit_hash"'/' \
+		-e 's/^(ENV\s+ADMINER_SRC_DOWNLOAD_SHA256=).*/\1'"$srcDownloadSha256"'/' \
 		"$version/fastcgi/Dockerfile" \
 		"$version/Dockerfile"
 done
