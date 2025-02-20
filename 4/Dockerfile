@@ -1,4 +1,4 @@
-FROM php:7.4-alpine
+FROM php:8.3-alpine
 
 RUN	echo "upload_max_filesize = 128M" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
 &&	echo "post_max_size = 128M" >> /usr/local/etc/php/conf.d/0-upload_large_dumps.ini \
@@ -40,9 +40,9 @@ RUN	set -x \
 
 COPY	*.php /var/www/html/
 
-ENV	ADMINER_VERSION 4.8.1
-ENV	ADMINER_DOWNLOAD_SHA256 2fd7e6d8f987b243ab1839249551f62adce19704c47d3d0c8dd9e57ea5b9c6b3
-ENV	ADMINER_COMMIT 1f173e18bdf0be29182e0d67989df56eadea4754
+ENV	ADMINER_VERSION 4.16.0
+ENV	ADMINER_DOWNLOAD_SHA256 f2596b1f110af2dff35c9a55b799bca16a160e6b482ab81b4bbf1378f5b4463f
+ENV	ADMINER_COMMIT 9c9fc4a85b3b35b059fcf9bf334789c0378becb7
 
 RUN	set -x \
 &&	apk add --no-cache --virtual .build-deps git \
