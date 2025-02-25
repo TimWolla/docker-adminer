@@ -1,5 +1,5 @@
-#!/bin/bash
-set -eu
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
 declare -A aliases=(
 	[4]='latest'
@@ -8,11 +8,14 @@ declare -A aliases=(
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-versions=( */ )
-versions=( "${versions[@]%/}" )
+if [ "$#" -eq 0 ]; then
+	versions=( */ )
+	versions=( "${versions[@]%/}" )
+	eval "set -- $versions"
+fi
 
 # sort version numbers with highest first
-IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -rV) ); unset IFS
+IFS=$'\n'; set -- $(sort -rV <<<"$*"); unset IFS
 
 # get the most recent commit which modified any of "$@"
 fileCommit() {
@@ -38,17 +41,19 @@ dirCommit() {
 
 getArches() {
 	local repo="$1"; shift
-	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
+	local officialImagesBase="${BASHBREW_LIBRARY:-https://github.com/docker-library/official-images/raw/HEAD/library}/"
 
-	eval "declare -g -A parentRepoToArches=( $(
-		find -name 'Dockerfile' -exec awk '
-				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|microsoft\/[^:]+)(:|$)/ {
-					print "'"$officialImagesUrl"'" $2
+	local parentRepoToArchesStr
+	parentRepoToArchesStr="$(
+		find -name 'Dockerfile' -exec awk -v officialImagesBase="$officialImagesBase" '
+				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
+					printf "%s%s\n", officialImagesBase, $2
 				}
 			' '{}' + \
 			| sort -u \
-			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
-	) )"
+			| xargs -r bashbrew cat --format '["{{ .RepoName }}:{{ .TagName }}"]="{{ join " " .TagEntry.Architectures }}"'
+	)"
+	eval "declare -g -A parentRepoToArches=( $parentRepoToArchesStr )"
 }
 getArches 'adminer'
 
@@ -66,7 +71,9 @@ join() {
 	echo "${out#$sep}"
 }
 
-for version in "${versions[@]}"; do
+for version; do
+	export version
+
 	commit="$(dirCommit "$version")"
 
 	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '
@@ -86,30 +93,31 @@ for version in "${versions[@]}"; do
 		${aliases[$version]:-}
 	)
 
-	for variant in \
-		'' \
-		fastcgi \
-	; do
+	for variant in '' fastcgi; do
+		export variant
 		dir="$version${variant:+/$variant}"
-		[ -f "$dir/Dockerfile" ] || continue
-		variant="${variant:-standalone}"
+		if [ ! -d "$dir" ]; then
+			continue
+		fi
 
 		commit="$(dirCommit "$dir")"
 
-		slash='/'
-		variantAliases=( "${versionAliases[@]/%/-${variant//$slash/-}}" )
-		variantAliases=( "${variantAliases[@]//latest-/}" )
-		if [ "$variant" = 'standalone' ]; then
-			variantAliases+=( "${versionAliases[@]}" )
+		if [ -n "$variant" ]; then
+			variantAliases=( "${versionAliases[@]/%/-$variant}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
+		else
+			variantAliases=( "${versionAliases[@]}" )
+			variantAliases+=( "${versionAliases[@]/%/-standalone}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
 		fi
 
-		variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
-		variantArches="${parentRepoToArches[$variantParent]}"
+		parent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+		arches="${parentRepoToArches[$parent]}"
 
 		echo
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
-			Architectures: $(join ', ' $variantArches)
+			Architectures: $(join ', ' $arches)
 			GitCommit: $commit
 			Directory: $dir
 		EOE
