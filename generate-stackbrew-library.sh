@@ -69,7 +69,16 @@ join() {
 for version in "${versions[@]}"; do
 	commit="$(dirCommit "$version")"
 
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "ADMINER_VERSION" { print $3; exit }')"
+	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '
+		$1 == "ENV" { env=1 }
+		env {
+			for (i=1; i <= NF; i++) {
+				split($i, a, "=");
+				if (a[1] == "ADMINER_VERSION") { print a[2]; exit }
+			}
+		}
+		env && !/\\$/ { env=0 }
+	')"
 
 	versionAliases=(
 		$fullVersion
