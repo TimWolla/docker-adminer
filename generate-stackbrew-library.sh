@@ -11,7 +11,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 if [ "$#" -eq 0 ]; then
 	versions=( */ )
 	versions=( "${versions[@]%/}" )
-	eval "set -- $versions"
+	eval "set -- ${versions[@]}"
 fi
 
 # sort version numbers with highest first
