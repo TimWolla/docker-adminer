@@ -1,30 +1,40 @@
 <?php
 namespace docker {
+	final class DefaultServerPlugin {
+		public function __construct(
+			private \AdminerPlugin $adminer
+		) { }
+
+		public function loginFormField(...$args) {
+			return (function (...$args) {
+				$field = \Adminer\Adminer::loginFormField(...$args);
+	
+				return \str_replace(
+					'name="auth[server]" value="" title="hostname[:port]"',
+					\sprintf('name="auth[server]" value="%s" title="hostname[:port]"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
+					$field,
+				);
+			})->call($this->adminer, ...$args);
+		}
+	}
+
 	function adminer_object() {
 		require_once('plugins/plugin.php');
-
-		class Adminer extends \AdminerPlugin {
-			function _callParent($function, $args) {
-				if ($function === 'loginForm') {
-					ob_start();
-					$return = \Adminer\Adminer::loginForm();
-					$form = ob_get_clean();
-
-					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db').'" title="hostname[:port]"', $form);
-
-					return $return;
-				}
-
-				return parent::_callParent($function, $args);
-			}
-		}
 
 		$plugins = [];
 		foreach (glob('plugins-enabled/*.php') as $plugin) {
 			$plugins[] = require($plugin);
 		}
 
-		return new Adminer($plugins);
+		// Load the DefaultServerPlugin last to give other plugins a chance to
+		// override loginFormField() if they wish to.
+		$plugins[] = &$loginFormPlugin;
+
+		$adminer = new \AdminerPlugin($plugins);
+
+		$loginFormPlugin = new DefaultServerPlugin($adminer);
+
+		return $adminer;
 	}
 }
 
