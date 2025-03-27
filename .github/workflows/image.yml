@@ -49,7 +49,7 @@ jobs:
         docker run --name $container_name -d ${{ steps.build.outputs.image }}
         docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
           curl -fsSL http://$container_name:8080/ \
-          |grep -Pz '<span class="version">\n${{ steps.build.outputs.version }}'
+          |grep '<span class=.version.>${{ steps.build.outputs.version }}'
       env:
         container_name: adminer_version
     - name: Verify that no warnings appear.
