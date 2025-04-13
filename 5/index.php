@@ -1,38 +1,42 @@
 <?php
 namespace docker {
-	final class DefaultServerPlugin {
-		public function __construct(
-			private \AdminerPlugin $adminer
-		) { }
-
-		public function loginFormField(...$args) {
-			return (function (...$args) {
-				$field = \Adminer\Adminer::loginFormField(...$args);
-	
-				return \str_replace(
-					'name="auth[server]" value="" title="hostname[:port]"',
-					\sprintf('name="auth[server]" value="%s" title="hostname[:port]"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
-					$field,
-				);
-			})->call($this->adminer, ...$args);
-		}
-	}
-
 	function adminer_object() {
-		require_once('plugins/plugin.php');
+		/**
+		 * Prefills the “Server” field with the ADMINER_DEFAULT_SERVER environment variable.
+		 */
+		final class DefaultServerPlugin extends \Adminer\Plugin {
+			public function __construct(
+				private \Adminer\Adminer $adminer
+			) { }
+
+			public function loginFormField(...$args) {
+				return (function (...$args) {
+					$field = $this->loginFormField(...$args);
+		
+					return \str_replace(
+						'name="auth[server]" value="" title="hostname[:port]"',
+						\sprintf('name="auth[server]" value="%s" title="hostname[:port]"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
+						$field,
+					);
+				})->call($this->adminer, ...$args);
+			}
+		}
 
 		$plugins = [];
 		foreach (glob('plugins-enabled/*.php') as $plugin) {
 			$plugins[] = require($plugin);
 		}
 
-		// Load the DefaultServerPlugin last to give other plugins a chance to
-		// override loginFormField() if they wish to.
-		$plugins[] = &$loginFormPlugin;
+		$adminer = new \Adminer\Plugins($plugins);
 
-		$adminer = new \AdminerPlugin($plugins);
-
-		$loginFormPlugin = new DefaultServerPlugin($adminer);
+		(function () {
+			$last = &$this->hooks['loginFormField'][\array_key_last($this->hooks['loginFormField'])];
+			if ($last instanceof \Adminer\Adminer) {
+				$defaultServerPlugin = new DefaultServerPlugin($last);
+				$this->plugins[] = $defaultServerPlugin;
+				$last = $defaultServerPlugin;
+			}
+		})->call($adminer);
 
 		return $adminer;
 	}
