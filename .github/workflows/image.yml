@@ -82,6 +82,15 @@ jobs:
           |grep 'ADMINER_DEFAULT_SERVER_WORKS'
       env:
         container_name: adminer_defaultserver
+    - name: Verify that loading plugins work.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      run: |
+        docker run --name $container_name -d -e ADMINER_PLUGINS="tables-filter version-noverify" ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep 'verifyVersion ='
+      env:
+        container_name: adminer_plugins
     - name: Show Containers and Images
       run: |
         printf "::group::docker ps -a\n"
