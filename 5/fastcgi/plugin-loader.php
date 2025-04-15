@@ -1,4 +1,5 @@
 <?php
+
 if (PHP_SAPI !== 'cli') exit;
 if ($_SERVER['argc'] !== 2) exit;
 
@@ -37,6 +38,10 @@ if (count($classes) == 0) {
 if (count($classes) > 1) {
 	fwrite(STDERR, 'Unable to load plugin file "'.$name.'", because it defines multiple classes.'."\n");
 	exit(1);
+}
+
+if (!class_exists(\Adminer\Plugin::class)) {
+	class_alias(stdClass::class, \Adminer\Plugin::class);
 }
 
 // Check constructor.
