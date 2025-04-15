@@ -11,7 +11,9 @@ fi
 
 number=1
 for PLUGIN in $ADMINER_PLUGINS; do
-	php plugin-loader.php "$PLUGIN" > plugins-enabled/$(printf "%03d" $number)-$PLUGIN.php
+	if [ ! -f plugins-enabled/$PLUGIN.php ]; then
+		php plugin-loader.php "$PLUGIN" > plugins-enabled/$(printf "%03d" $number)-$PLUGIN.php
+	fi
 	number=$(($number+1))
 done
 
