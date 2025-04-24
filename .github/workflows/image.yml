@@ -73,7 +73,7 @@ jobs:
             |grep 'Nette'
         env:
           container_name: adminer_design
-      - name: Verify that the default server works.
+      - name: Verify that the default dbname works.
         if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
         run: |
           docker run --name $container_name -d -e ADMINER_DEFAULT_SERVER=ADMINER_DEFAULT_SERVER_WORKS ${{ steps.build.outputs.image }}
@@ -82,16 +82,16 @@ jobs:
             |grep 'ADMINER_DEFAULT_SERVER_WORKS'
         env:
           container_name: adminer_defaultserver
-      - name: Verify that the default server works.
+      - name: Verify that the default driver works.
         if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
         run: |
-          docker run --name $container_name -d -e ADMINER_DEFAULT_DRIVER=ADMINER_DEFAULT_DRIVER_WORKS ${{ steps.build.outputs.image }}
+          docker run --name $container_name -d -e ADMINER_DEFAULT_DRIVER=pgsql ${{ steps.build.outputs.image }}
           docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
             curl -fsSL http://$container_name:8080/ \
-            |grep 'ADMINER_DEFAULT_DRIVER_WORKS'
+            |grep 'pgsql'
         env:
           container_name: adminer_defaultdriver
-      - name: Verify that the default server works.
+      - name: Verify that the default dbname works.
         if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
         run: |
           docker run --name $container_name -d -e ADMINER_DEFAULT_DBNAME=ADMINER_DEFAULT_DBNAME_WORKS ${{ steps.build.outputs.image }}
