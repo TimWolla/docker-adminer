@@ -10,7 +10,28 @@ namespace docker {
 					$return = \Adminer::loginForm();
 					$form = ob_get_clean();
 
-					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db').'" title="hostname[:port]"', $form);
+					// Set default values via env vars.
+					$defaultDbDriver = getenv('ADMINER_DEFAULT_DRIVER') ?: 'server';
+					$defaultDbHost = getenv('ADMINER_DEFAULT_SERVER') ?: '';
+					$defaultDb = getenv('ADMINER_DEFAULT_DBNAME') ?: '';
+
+					$defaultDbDriver = $defaultDbDriver == 'mysql' ? 'server' : $defaultDbDriver;
+
+					echo str_replace(
+							[
+									'name="auth[server]" value="" title="hostname[:port]"',
+									'value="' . $defaultDbDriver . '"',
+									'selected="">MySQL',
+									'name="auth[db]" value=""'
+							],
+							[
+									'name="auth[server]" value="' . $defaultDbHost . '" title="hostname[:port]"',
+									'value="' . $defaultDbDriver . '" selected="selected"',
+									'>MySQL',
+									'name="auth[db]" value="' . $defaultDb . '"'
+							],
+							$form
+					);
 
 					return $return;
 				}
