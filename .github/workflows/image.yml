@@ -31,7 +31,7 @@ jobs:
       run: |
         docker run --name $container_name -d ${{ steps.build.outputs.image }}
       env:
-        container_name: adminer_smoke 
+        container_name: adminer_smoke
     - name: Verify a restart works.
       if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
       run: |

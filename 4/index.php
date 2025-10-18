@@ -10,7 +10,37 @@ namespace docker {
 					$return = \Adminer::loginForm();
 					$form = ob_get_clean();
 
-					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db').'" title="hostname[:port]"', $form);
+					$form = str_replace(
+						'name="auth[server]" value="" title="hostname[:port]"',
+						'name="auth[server]" value="'.(getenv('ADMINER_DEFAULT_SERVER') ?: 'db').'" title="hostname[:port]"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[username]" id="username" value=""',
+						'name="auth[username]" value="'.(getenv('ADMINER_DEFAULT_USER') ?: '').'"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[password]"',
+						'name="auth[password]" value="'.(getenv('ADMINER_DEFAULT_PASSWORD') ?: '').'"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[db]"',
+						'name="auth[db]" value="'.(getenv('ADMINER_DEFAULT_DB') ?: '').'"',
+						$form
+					);
+
+					$driver = $_ENV['ADMINER_DEFAULT_DRIVER'] ?? null;
+					$script = '';
+					if ($driver !== null && $driver !== '') {
+						$script = '<script>(function(){var f=document;var el=f.querySelector("[name='."\"auth[driver]\"".']"); if(el){el.value=' . json_encode($driver) . ';}})();</script>';
+					}
+
+					echo $form . $script;
 
 					return $return;
 				}

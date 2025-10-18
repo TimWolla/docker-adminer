@@ -12,12 +12,53 @@ namespace docker {
 			public function loginFormField(...$args) {
 				return (function (...$args) {
 					$field = $this->loginFormField(...$args);
-		
+
 					return \str_replace(
 						'name="auth[server]" value="" title="hostname[:port]"',
 						\sprintf('name="auth[server]" value="%s" title="hostname[:port]"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
 						$field,
 					);
+				})->call($this->adminer, ...$args);
+			}
+
+			public function loginForm(...$args) {
+				return (function (...$args) {
+					ob_start();
+					$return = $this->loginForm(...$args);
+					$form = ob_get_clean();
+
+					$form = str_replace(
+						'name="auth[server]" value="" title="hostname[:port]"',
+						'name="auth[server]" value="'.(getenv('ADMINER_DEFAULT_SERVER') ?: 'db').'" title="hostname[:port]"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[username]" id="username" value=""',
+						'name="auth[username]" value="'.(getenv('ADMINER_DEFAULT_USER') ?: '').'"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[password]"',
+						'name="auth[password]" value="'.(getenv('ADMINER_DEFAULT_PASSWORD') ?: '').'"',
+						$form
+					);
+
+					$form = str_replace(
+						'name="auth[db]"',
+						'name="auth[db]" value="'.(getenv('ADMINER_DEFAULT_DB') ?: '').'"',
+						$form
+					);
+
+					$driver = $_ENV['ADMINER_DEFAULT_DRIVER'] ?? null;
+					$script = '';
+					if ($driver !== null && $driver !== '') {
+						$script = '<script>(function(){var f=document;var el=f.querySelector("[name='."\"auth[driver]\"".']"); if(el){el.value=' . json_encode($driver) . ';}})();</script>';
+					}
+
+					echo $form . $script;
+					return $return;
 				})->call($this->adminer, ...$args);
 			}
 		}
