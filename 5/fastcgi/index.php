@@ -9,13 +9,19 @@ namespace docker {
 				private \Adminer\Adminer $adminer
 			) { }
 
-			public function loginFormField(...$args) {
-				return (function (...$args) {
+			public function loginFormField(...$args): string {
+				return (function (...$args): string {
 					$field = $this->loginFormField(...$args);
 		
-					return \str_replace(
-						'name="auth[server]" value="" title="hostname[:port]"',
-						\sprintf('name="auth[server]" value="%s" title="hostname[:port]"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
+					return \preg_replace_callback(
+						'/name="auth\[server\]" value="" title="(?:[^"]+)"/',
+						static function (array $matches): string {
+							return \str_replace(
+								'value=""',
+								\sprintf('value="%s"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
+								$matches[0],
+							);
+						},
 						$field,
 					);
 				})->call($this->adminer, ...$args);
