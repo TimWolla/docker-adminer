@@ -10,7 +10,38 @@ namespace docker {
 					$return = \Adminer::loginForm();
 					$form = ob_get_clean();
 
-					echo str_replace('name="auth[server]" value="" title="hostname[:port]"', 'name="auth[server]" value="'.($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db').'" title="hostname[:port]"', $form);
+					if (!empty($_ENV['ADMINER_DEFAULT_DRIVER'])) {
+						$form = \preg_replace(
+							'#<select name=["\']auth\[driver\]["\'].*</select>#',
+							\sprintf('<input name="auth[driver]" value="%s">', $_ENV['ADMINER_DEFAULT_DRIVER']),
+							$form,
+						);
+					}
+
+					if (!empty($_ENV['ADMINER_DEFAULT_PASSWORD'])) {
+						$form = \preg_replace(
+							'#name="auth\[password\]" (value="([^"]*)" )?#',
+							\sprintf('name="auth[password]" value="%s" ', $_ENV['ADMINER_DEFAULT_PASSWORD']),
+							$form,
+						);
+					}
+
+					$form = \preg_replace_callback(
+						'/name="auth\[(server|username|db)\]" (id="[^"]*" )?(autofocus )?value="([^"]*)"/',
+						static function (array $matches): string {
+							$defaultValues = ['server' => 'db'];
+							return \sprintf(
+								'name="auth[%s]" %s%svalue="%s"',
+								$matches[1],
+								$matches[2] ?: '',
+								$matches[3] ?: '',
+								$_ENV['ADMINER_DEFAULT_' . \strtoupper($matches[1])] ?? ($matches[4] ?: ($defaultValues[$matches[1]] ?? ''))
+							);
+						},
+						$form,
+					);
+
+					echo $form;
 
 					return $return;
 				}
