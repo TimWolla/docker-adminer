@@ -31,7 +31,7 @@ RUN	set -x \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)" \
-&&	apk add --virtual .phpexts-rundeps $runDeps \
+&&	apk add --no-cache --virtual .phpexts-rundeps $runDeps \
 &&	apk del --no-network .build-deps
 
 COPY	*.php /var/www/html/
