@@ -2,9 +2,9 @@
 namespace docker {
 	function adminer_object() {
 		/**
-		 * Prefills the “Server” field with the ADMINER_DEFAULT_SERVER environment variable.
+		 * Prefills login fields with the corresponding ADMINER_DEFAULT_* environment variables.
 		 */
-		final class DefaultServerPlugin extends \Adminer\Plugin {
+		final class EnvLoginFormFieldsPlugin extends \Adminer\Plugin {
 			public function __construct(
 				private \Adminer\Adminer $adminer
 			) { }
@@ -12,14 +12,33 @@ namespace docker {
 			public function loginFormField(...$args): string {
 				return (function (...$args): string {
 					$field = $this->loginFormField(...$args);
-		
+
+					if (!empty($_ENV['ADMINER_DEFAULT_DRIVER']) && \str_contains($field, '<select')) {
+						return \preg_replace(
+							'#<select name=["\']auth\[driver\]["\'].*</select>#',
+							\sprintf('<input name="auth[driver]" value="%s">', $_ENV['ADMINER_DEFAULT_DRIVER']),
+							$field,
+						);
+					}
+
+					if (!empty($_ENV['ADMINER_DEFAULT_PASSWORD']) && \str_contains($field, 'auth[password]')) {
+						return \preg_replace(
+							'/name="auth\[password\]" (value="([^"]*)" )?/',
+							\sprintf('name="auth[password]" value="%s" ', $_ENV['ADMINER_DEFAULT_PASSWORD']),
+							$field,
+						);
+					}
+
 					return \preg_replace_callback(
-						'/name="auth\[server\]" value="" title="(?:[^"]+)"/',
+						'/name="auth\[(server|username|db)\]" (id="[^"]*" )?(autofocus )?value="([^"]*)"/',
 						static function (array $matches): string {
-							return \str_replace(
-								'value=""',
-								\sprintf('value="%s"', ($_ENV['ADMINER_DEFAULT_SERVER'] ?: 'db')),
-								$matches[0],
+							$defaultValues = ['server' => 'db'];
+							return \sprintf(
+								'name="auth[%s]" %s%svalue="%s"',
+								$matches[1],
+								$matches[2] ?: '',
+								$matches[3] ?: '',
+								$_ENV['ADMINER_DEFAULT_' . \strtoupper($matches[1])] ?? ($matches[4] ?: ($defaultValues[$matches[1]] ?? ''))
 							);
 						},
 						$field,
@@ -38,9 +57,9 @@ namespace docker {
 		(function () {
 			$last = &$this->hooks['loginFormField'][\array_key_last($this->hooks['loginFormField'])];
 			if ($last instanceof \Adminer\Adminer) {
-				$defaultServerPlugin = new DefaultServerPlugin($last);
-				$this->plugins[] = $defaultServerPlugin;
-				$last = $defaultServerPlugin;
+				$envLoginFormFieldsPlugin = new EnvLoginFormFieldsPlugin($last);
+				$this->plugins[] = $envLoginFormFieldsPlugin;
+				$last = $envLoginFormFieldsPlugin;
 			}
 		})->call($adminer);
 
