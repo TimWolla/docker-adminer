@@ -14,6 +14,8 @@ jobs:
         - "4/fastcgi"
         - "5"
         - "5/fastcgi"
+        - "6"
+        - "6/fastcgi"
     steps:
     - uses: actions/checkout@v7
     - name: Build the image.
