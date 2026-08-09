@@ -85,12 +85,32 @@ jobs:
       env:
         container_name: adminer_defaultserver
     - name: Verify that loading plugins work.
-      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') }}
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') && ! startsWith(matrix.variant, '6') }}
       run: |
         docker run --name $container_name -d -e ADMINER_PLUGINS="tables-filter version-noverify" ${{ steps.build.outputs.image }}
         docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
           curl -fsSL http://$container_name:8080/ \
           |grep 'verifyVersion ='
+      env:
+        container_name: adminer_plugins
+    - name: Verify that loading plugins work.
+      if: ${{ ! contains(steps.build.outputs.image, 'fastcgi') && startsWith(matrix.variant, '6') }}
+      run: |
+        # Since Adminer 6, the version-noverify plugin no longer injects a
+        # 'verifyVersion =' script. Instead it suppresses the version check,
+        # so the 'partial(verifyVersion' onload handler (present by default)
+        # must disappear when the plugin is loaded.
+        docker run --name ${container_name}_default -d ${{ steps.build.outputs.image }}
+        docker run -i --rm --link ${container_name}_default:${container_name}_default buildpack-deps:curl \
+          curl -fsSL http://${container_name}_default:8080/ \
+          |grep 'partial(verifyVersion'
+        docker run --name $container_name -d -e ADMINER_PLUGINS="tables-filter version-noverify" ${{ steps.build.outputs.image }}
+        docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep '<span class=.version.>'
+        ! docker run -i --rm --link $container_name:$container_name buildpack-deps:curl \
+          curl -fsSL http://$container_name:8080/ \
+          |grep 'partial(verifyVersion'
       env:
         container_name: adminer_plugins
     - name: Show Containers and Images
